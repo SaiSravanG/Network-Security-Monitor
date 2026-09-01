@@ -63,7 +63,8 @@ TO STOP THE PACKET CAPTURE DO CONTROL + C ON THE KEYBOARD
 
 Launch a New Command Prompt and run Detection Engine by: python detection_engine.py
 
-The Output: <img width="1152" height="648" alt="Untitled" src="https://github.com/user-attachments/assets/418317ac-97f5-402f-b01b-9edfe373a01c" />
+The Output: <img width="709" height="440" alt="image" src="https://github.com/user-attachments/assets/3d442001-cea6-476d-93c4-2acf5756794b" />
+
 
 
 To View the Security Alerts run: python view_alerts.py

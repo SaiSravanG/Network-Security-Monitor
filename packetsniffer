@@ -1,0 +1,96 @@
+from scapy.all import sniff, IP, TCP, UDP
+from database import create_database, save_packet
+from datetime import datetime
+
+
+packet_count = 0
+
+
+def process_packet(packet):
+    global packet_count
+
+    if not packet.haslayer(IP):
+        return
+
+    packet_count += 1
+
+    # Basic IP information
+    source_ip = packet[IP].src
+    destination_ip = packet[IP].dst
+
+    # Default values
+    protocol = "Other"
+    source_port = "-"
+    destination_port = "-"
+    tcp_flags = "-"
+
+    # TCP packet
+    if packet.haslayer(TCP):
+        protocol = "TCP"
+        source_port = str(packet[TCP].sport)
+        destination_port = str(packet[TCP].dport)
+        tcp_flags = str(packet[TCP].flags)
+
+    # UDP packet
+    elif packet.haslayer(UDP):
+        protocol = "UDP"
+        source_port = str(packet[UDP].sport)
+        destination_port = str(packet[UDP].dport)
+
+    # Packet size
+    packet_size = len(packet)
+
+    # Timestamp
+    timestamp = datetime.now().strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
+
+    # Save packet to database
+    save_packet(
+        timestamp,
+        source_ip,
+        destination_ip,
+        protocol,
+        source_port,
+        destination_port,
+        packet_size,
+        tcp_flags
+    )
+
+    # Display packet
+    print("=" * 60)
+    print(f"PACKET #{packet_count}")
+    print("=" * 60)
+    print(f"Time:              {timestamp}")
+    print(f"Source IP:         {source_ip}")
+    print(f"Destination IP:    {destination_ip}")
+    print(f"Protocol:          {protocol}")
+    print(f"Source Port:       {source_port}")
+    print(f"Destination Port:  {destination_port}")
+    print(f"Packet Size:       {packet_size} bytes")
+    print(f"TCP Flags:         {tcp_flags}")
+    print("=" * 60)
+
+
+def start_sniffer():
+    print("=" * 60)
+    print("       NETWORK PACKET SNIFFER")
+    print("=" * 60)
+
+    print()
+    print("Starting packet capture...")
+    print("Press CTRL+C to stop.")
+    print()
+
+    sniff(
+        prn=process_packet,
+        store=False
+    )
+
+
+if __name__ == "__main__":
+    # Make sure database tables exist
+    create_database()
+
+    # Start packet capture
+    start_sniffer()
